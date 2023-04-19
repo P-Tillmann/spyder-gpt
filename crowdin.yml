@@ -1,0 +1,15 @@
+# ----------------------------------------------------------------------------
+# Copyright © 2023, Peter Tillmann
+#
+# Licensed under the terms of the MIT license
+# ----------------------------------------------------------------------------
+
+commit_message: '[ci skip] New %language% translation from Crowdin'
+append_commit_message: false
+files:
+  - source: /spyder_gpt/spyder/locale/spyder_gpt.pot
+    translation: /spyder_gpt/spyder_gpt/locale/%two_letters_code%/LC_MESSAGES/%file_name%.po
+    languages_mapping:
+      two_letters_code:
+        pt-BR: pt_BR
+        zh-CN: zh_CN
