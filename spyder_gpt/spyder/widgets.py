@@ -8,6 +8,11 @@
 GPT in Spyder Main Widget.
 """
 
+import os
+import openai
+openai.organization = "org-WJrCSHEbMT7I03koyiM7aAk5"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 # Third party imports
 from qtpy.QtWidgets import QHBoxLayout, QLabel
@@ -47,6 +52,36 @@ class GPTinSpyderToolBarSections:
 class GPTinSpyderOptionsMenuSections:
     ExampleSection = "example_section"
 
+
+simple_css = """
+.chatbot-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+/* Chatbot message */
+.chatbot-message {
+    background-color: #34495e;
+    color: white;
+    border-radius: 5px;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+/* User message */
+.user-message {
+    background-color: #2980b9;
+    color: white;
+    border-radius: 5px;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    text-align: right;
+    font-size: 14px;
+}
+"""
 
 class GPTinSpyderWidget(PluginMainWidget):
 
@@ -107,10 +142,31 @@ class GPTinSpyderWidget(PluginMainWidget):
     
     def display_text(self):
        # get the text from the editor widget
-       text = self.editor.toPlainText()
-
+       prompt = self.editor.toPlainText()
+       
+       response = openai.ChatCompletion.create(
+         model="gpt-3.5-turbo",
+         messages=[{"role": "system", "content": "You are a helpful assistant for python programming integrated into the spyder IDE."},
+                   {"role": "user", "content": prompt}],
+         temperature=0.7,
+         max_tokens=256,
+         top_p=1.0,
+         frequency_penalty=0.0,
+         presence_penalty=0.0
+       )
+       
+       response = response['choices'][0]['message']['content']
+       
+       html_content = f"""
+       <div class="user-message" style="text-align:right;">{prompt}</div> 
+       <div class="chatbot-message" style="text-align:left;">{response}</div> 
+        """
+        
        # set the HTML content of the browser widget to the text
-       self.browser.setHtml(text)
+       text_document = self.browser.document()
+       text_document.setDefaultStyleSheet(simple_css)
+       self.browser.setHtml(html_content)
+       
 
     def setup(self):
         # Create an example action
